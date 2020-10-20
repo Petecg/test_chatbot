@@ -10,8 +10,8 @@ app.listen(process.env.PORT || 5000, () => console.log('webhook is listening'));
 
 // Creates the endpoint for our webhook
 app.post('/webhook', (req, res) => {
-  let fbJson=JSON.stringify(req.body);
-  console.log(fbJson);
+  // let fbJson=JSON.stringify(req.body);
+  // console.log(fbJson);
   let body = req.body;
   if (body.object === 'page') { // Checks this is an event from a page subscription
     body.entry.forEach(function(entry) { // Iterates over each entry - there may be multiple if batched
@@ -93,4 +93,6 @@ function callSendAPI(sender_psid, response) {
       console.error("Error al enviar el mensaje:" + err);
     }
   });
+  console.log(process.env.PAGE_ACCESS_TOKEN);
+  console.log(JSON.stringify(request_body));
 }
