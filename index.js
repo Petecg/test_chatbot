@@ -95,7 +95,7 @@ function handleMessage(sender_psid, received_message) {
         }
       }
     }
-    callSendAPI(sender_psid, response); // Sends the response message
+  callSendAPI(sender_psid, response); // Sends the response message
 }
 
 // Handles messaging_postbacks events
@@ -131,6 +131,6 @@ function callSendAPI(sender_psid, response) {
       console.error("Error al enviar el mensaje:" + err);
     }
   });
-  // console.log(process.env.PAGE_ACCESS_TOKEN);
-  // console.log(JSON.stringify(request_body));
+  console.log(process.env.PAGE_ACCESS_TOKEN);
+  console.log(JSON.stringify(request_body));
 }
