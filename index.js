@@ -95,13 +95,20 @@ function handleMessage(sender_psid, received_message) {
         }
       }
     }
-    // Sends the response message
-    callSendAPI(sender_psid, response);
+    callSendAPI(sender_psid, response); // Sends the response message
 }
 
 // Handles messaging_postbacks events
 function handlePostback(sender_psid, received_postback) {
-
+  let response;
+  let payload = received_postback.payload; //Get the payload for the postback
+  // Set the response based on the postback payload
+  if (payload === 'yes') {
+    response = { "text": "Gracias!" }
+  } else if (payload === 'no') {
+    response = { "text": "Oops, Intenta enviar otra imagen." }
+  }
+  callSendAPI(sender_psid, response); // Send the message to acknowledge the postback
 }
 
 // Sends response messages via the Send API
@@ -124,6 +131,6 @@ function callSendAPI(sender_psid, response) {
       console.error("Error al enviar el mensaje:" + err);
     }
   });
-  console.log(process.env.PAGE_ACCESS_TOKEN);
-  console.log(JSON.stringify(request_body));
+  // console.log(process.env.PAGE_ACCESS_TOKEN);
+  // console.log(JSON.stringify(request_body));
 }
