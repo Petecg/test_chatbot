@@ -131,6 +131,6 @@ function callSendAPI(sender_psid, response) {
       console.error("Error al enviar el mensaje:" + err);
     }
   });
-  console.log(process.env.PAGE_ACCESS_TOKEN);
-  console.log(JSON.stringify(request_body));
+  // console.log(process.env.PAGE_ACCESS_TOKEN);
+  // console.log(JSON.stringify(request_body));
 }
