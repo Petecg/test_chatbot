@@ -160,17 +160,9 @@ function callSendAPI(sender_psid, response) {
 
 function callHandover(sender_psid){
   let handover_req={
-    "sender":{
-      "id": sender_psid
-    },
-    "recipient":{
-      "id":"107336410850663"
-    },
-    "pass_thread_control":{
-      "new_owner_app_id":"263902037430900",
-      "metadata":"La persona requiere a un humano"
-    }
-  }
+    "recipient":{"id":sender_psid},
+    "target_app_id":263902037430900,
+    "metadata":"Se solicitó atención de una persona"}
   request({
     "uri": "https://graph.facebook.com/v8.0/107336410850663/pass_thread_control",
     "qs": { "access_token": process.env.PAGE_ACCESS_TOKEN },
