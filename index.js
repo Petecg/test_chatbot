@@ -17,8 +17,8 @@ app.post('/webhook', (req, res) => {
   let body = req.body;
   if (body.object === 'page') { // Checks this is an event from a page subscription
     body.entry.forEach(function(entry) { // Iterates over each entry - there may be multiple if batched
-      // if(entry.includes("messaging")){
-      console.log(typeof(entry));
+      if(typeof(entry.messaging)!="undefined"){
+      // console.log(typeof(entry));
         // Gets the message. entry.messaging is an array, but will only ever contain one message, so we get index 0
         let webhook_event = entry.messaging[0];
         // console.log(webhook_event);
@@ -31,8 +31,10 @@ app.post('/webhook', (req, res) => {
         } else if (webhook_event.postback) {
           handlePostback(sender_psid, webhook_event.postback);
         }
-      // }
-      // if(entry.includes("standby")){}
+      }
+      if(typeof(entry.standy)!="undefined"){
+        console.log("Se recibio evento STANDBY");
+      }
     });
     res.status(200).send('EVENT_RECEIVED'); // Returns a '200 OK' response to all requests
   }
