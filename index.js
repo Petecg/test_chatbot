@@ -32,7 +32,7 @@ app.post('/webhook', (req, res) => {
           handlePostback(sender_psid, webhook_event.postback);
         }
       }
-      if(typeof(entry.standy)!="undefined"){
+      if(typeof(entry.standby)!="undefined"){
         console.log("Se recibio evento STANDBY");
       }
     });
