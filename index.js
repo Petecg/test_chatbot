@@ -19,10 +19,10 @@ app.post('/webhook', (req, res) => {
     body.entry.forEach(function(entry) { // Iterates over each entry - there may be multiple if batched
       // Gets the message. entry.messaging is an array, but will only ever contain one message, so we get index 0
       let webhook_event = entry.messaging[0];
-      console.log(webhook_event);
+      // console.log(webhook_event);
       // Get the sender PSID
       let sender_psid = webhook_event.sender.id;
-      console.log('Sender PSID: ' + sender_psid);
+      // console.log('Sender PSID: ' + sender_psid);
       // Check if the event is a message or postback and pass the event to the appropriate handler function
       if (webhook_event.message) {
         handleMessage(sender_psid, webhook_event.message);
@@ -63,7 +63,29 @@ function handleMessage(sender_psid, received_message) {
     if (received_message.text) {
       // Create the payload for a basic text message
       response = {
-        "text": `Recibimos este mensaje: "${received_message.text}". ¡Ahora envía una imagen!`
+        "attachment": {
+          "type": "template",
+          "payload": {
+            "template_type": "generic",
+            "elements": [{
+              "title": "Bienvenido a la página\nSoy el Foto-bot",
+              "subtitle": "¿En qué te puedo ayudar?",
+              "image_url": "https://www.pngkit.com/png/detail/955-9556311_camara-de-fotos-caricatura.png",
+              "buttons": [
+                {
+                  "type": "postback",
+                  "title": "Información",
+                  "payload": "info",
+                },
+                {
+                  "type": "postback",
+                  "title": "Contactar a un humano",
+                  "payload": "handover",
+                }
+              ],
+            }]
+          }
+        }
       }
     }
     else if (received_message.attachments) {
@@ -103,10 +125,11 @@ function handlePostback(sender_psid, received_postback) {
   let response;
   let payload = received_postback.payload; //Get the payload for the postback
   // Set the response based on the postback payload
-  if (payload === 'yes') {
-    response = { "text": "Gracias!" }
-  } else if (payload === 'no') {
-    response = { "text": "Oops, Intenta enviar otra imagen." }
+  if (payload === 'info') {
+    response = { "text": "Una información Lorem Ipsum" }
+  } else if (payload === 'handover') {
+    response = { "text": "Lo estamos transfiriendo" }
+    callHandover(sender_psid);
   }
   callSendAPI(sender_psid, response); // Send the message to acknowledge the postback
 }
@@ -133,4 +156,31 @@ function callSendAPI(sender_psid, response) {
   });
   // console.log(process.env.PAGE_ACCESS_TOKEN);
   // console.log(JSON.stringify(request_body));
+}
+
+function callHandover(sender_psid){
+  let handover_req={
+    "sender":{
+      "id": sender_psid
+    },
+    "recipient":{
+      "id":"107336410850663"
+    },
+    "pass_thread_control":{
+      "new_owner_app_id":"263902037430900",
+      "metadata":"La persona requiere a un humano"
+    }
+  }
+  request({
+    "uri": "https://graph.facebook.com/v8.0/107336410850663/pass_thread_control",
+    "qs": { "access_token": process.env.PAGE_ACCESS_TOKEN },
+    "method": "POST",
+    "json": handover_req
+  }, (err, res, body) => {
+    if (!err) {
+      console.log('handover ejecutado')
+    } else {
+      console.error("Error al enviar ejecutar handover:" + err);
+    }
+  });
 }
