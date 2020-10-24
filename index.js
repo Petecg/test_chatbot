@@ -115,9 +115,26 @@ function handlePostback(sender_psid, received_postback) {
   let payload = received_postback.payload; //Get the payload for the postback
   // Set the response based on the postback payload
   if (payload === 'info') {
-    response = { "text": "Una información Lorem Ipsum" }
-  } else if (payload === 'handover') {
-    response = { "text": "Lo estamos transfiriendo" }
+    response = {"attachment": {"type": "template","payload": {
+      "template_type": "generic","elements": [{
+          "title": "Evento Social","subtitle": "Costo por evento $1,500",
+          "image_url": attachment_url,"buttons": [{"type": "postback","title": "Quiero un Evento Social","payload": "compra",}],},
+          {"title": "Evento Deportivo","subtitle": "Costo por hora $250",
+          "image_url": attachment_url,"buttons": [{"type": "postback","title": "Quiero un Evento Deportivo","payload": "compra",}],},
+          {"title": "Sesión de retrato","subtitle": "Costo por hora $350",
+          "image_url": attachment_url,"buttons": [{"type": "postback","title": "Quiero una Sesión de Retrato","payload": "compra",}],},
+          {"title": "Otro tipo de sesión","subtitle": "Contactame",
+          "image_url": attachment_url,"buttons": [{"type": "postback","title": "Quiero más información","payload": "handover",}],}
+        ]
+      }
+    }}
+  }
+  if (payload === 'handover') {
+    response = {"text": "Lo estamos transfiriendo con Pete ;)"}
+    callHandover(sender_psid);
+  }
+  if (payload === 'compra') {
+    response = {"text": "Afina los detalles con Pete ;)"}
     callHandover(sender_psid);
   }
   callSendAPI(sender_psid, response); // Send the message to acknowledge the postback
