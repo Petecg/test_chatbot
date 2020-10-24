@@ -82,7 +82,7 @@ function handleMessage(sender_psid, received_message) {
           "type": "template","payload": {
             "template_type": "generic","elements": [{
               "title": "Bienvenido a la página\nSoy el Foto-bot","subtitle": "¿En qué te puedo ayudar?",
-              "image_url": "https://www.pngkit.com/png/detail/955-9556311_camara-de-fotos-caricatura.png",
+              "image_url": "http://volley.mx/peteFoto/foto_bot_01.png",
               "buttons": [{"type": "postback","title": "Información","payload": "info",},
                 {"type": "postback","title": "Contactar a un humano","payload": "handover",}],
             }]
