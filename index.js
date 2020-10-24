@@ -40,9 +40,10 @@ app.post('/webhook', (req, res) => {
       if(typeof(entry.standby)!="undefined"){
         console.log("Se recibio evento STANDBY");
       }
-      // if(typeof(entry.standby)!="undefined"){
-      //   console.log("Se recibio evento STANDBY");
-      // }
+      if(typeof(entry.request_thread_control)!="undefined"){
+        console.log("Se recibio solicitud de entregar el control");
+        passThreadControl(entry.request_thread_control.requested_owner_app_id);
+      }
     });
     res.status(200).send('EVENT_RECEIVED'); // Returns a '200 OK' response to all requests
   }
@@ -187,6 +188,24 @@ function callHandover(sender_psid){
       console.log('handover ejecutado')
     } else {
       console.error("Error al enviar ejecutar handover:" + err);
+    }
+  });
+}
+
+function passThreadControl(requestorApp){
+  let handover_req={
+    "target_app_id":requestorApp,
+    "metadata":"Se solicitó atención de una persona"}
+  request({
+    "uri": "https://graph.facebook.com/v8.0/107336410850663/pass_thread_control",
+    "qs": { "access_token": process.env.PAGE_ACCESS_TOKEN },
+    "method": "POST",
+    "json": handover_req
+  }, (err, res, body) => {
+    if (!err) {
+      console.log('Solicitud de handover honrada')
+    } else {
+      console.error("Error al honrar handover:" + err);
     }
   });
 }
