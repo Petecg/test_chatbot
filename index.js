@@ -115,23 +115,23 @@ function handlePostback(sender_psid, received_postback) {
   let payload = received_postback.payload; //Get the payload for the postback
   // Set the response based on the postback payload
   if (payload === 'info') {
-    let attachment_url="https://icdn5.digitaltrends.com/image/digitaltrends_es/photo-printing-header-640x0-768x768.jpg";
+    //let attachment_url="https://icdn5.digitaltrends.com/image/digitaltrends_es/photo-printing-header-640x0-768x768.jpg";
     response = {"attachment": {"type": "template","payload": {
       "template_type": "generic","elements": [{
           "title": "Evento Social","subtitle": "Costo por evento $1,500",
-          "image_url": attachment_url,"buttons": [{"type": "postback","title": "Quiero un Evento Social","payload": "compra",}],},
+          "image_url": "http://volley.mx/peteFoto/ev_social.png","buttons": [{"type": "postback","title": "Quiero un Evento Social","payload": "compra",}],},
           {"title": "Evento Deportivo","subtitle": "Costo por hora $250",
-          "image_url": attachment_url,"buttons": [{"type": "postback","title": "Quiero un Evento Deportivo","payload": "compra",}],},
+          "image_url": "http://volley.mx/peteFoto/ev_deportivo.png","buttons": [{"type": "postback","title": "Quiero un Evento Deportivo","payload": "compra",}],},
           {"title": "Sesión de retrato","subtitle": "Costo por hora $350",
-          "image_url": attachment_url,"buttons": [{"type": "postback","title": "Quiero una Sesión de Retrato","payload": "compra",}],},
+          "image_url": "http://volley.mx/peteFoto/retrato.png","buttons": [{"type": "postback","title": "Quiero una Sesión de Retrato","payload": "compra",}],},
           {"title": "Otro tipo de sesión","subtitle": "Contactame",
-          "image_url": attachment_url,"buttons": [{"type": "postback","title": "Quiero más información","payload": "handover",}],}
+          "image_url": "http://volley.mx/peteFoto/foto_otros.png","buttons": [{"type": "postback","title": "Quiero más información","payload": "handover",}],}
         ]
       }
     }}
   }
   if (payload === 'handover') {
-    response = {"text": "Lo estamos transfiriendo con Pete ;)"}
+    response = {"text": "Te transfiero con Pete ;)"}
     callHandover(sender_psid);
   }
   if (payload === 'compra') {
