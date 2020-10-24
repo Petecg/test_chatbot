@@ -11,10 +11,10 @@ const dotenv=require('dotenv');
 dotenv.config();
 
 //Terminación del proceso
-process.on('SIGTERM', () => {
-  console.log('Proceso terminado')
-  process.exit();
-})
+// process.on('SIGTERM', () => {
+//   console.log('Proceso terminado')
+//   process.exit();
+// })
 
 // Creates the endpoint for our webhook
 app.post('/webhook', (req, res) => {
@@ -115,6 +115,7 @@ function handlePostback(sender_psid, received_postback) {
   let payload = received_postback.payload; //Get the payload for the postback
   // Set the response based on the postback payload
   if (payload === 'info') {
+    let attachment_url="https://icdn5.digitaltrends.com/image/digitaltrends_es/photo-printing-header-640x0-768x768.jpg";
     response = {"attachment": {"type": "template","payload": {
       "template_type": "generic","elements": [{
           "title": "Evento Social","subtitle": "Costo por evento $1,500",
