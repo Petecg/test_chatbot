@@ -33,16 +33,16 @@ app.post('/webhook', (req, res) => {
         // Check if the event is a message or postback and pass the event to the appropriate handler function
         if (webhook_event.message) {
           handleMessage(sender_psid, webhook_event.message);
-        } else if (webhook_event.postback) {
+        }
+        if (webhook_event.postback) {
           handlePostback(sender_psid, webhook_event.postback);
+        }
+        if (webhook_event.request_thread_control) {
+          passThreadControl(sender_psid, webhook_event.request_thread_control.requested_owner_app_id);
         }
       }
       if(typeof(entry.standby)!="undefined"){
         console.log("Se recibio evento STANDBY");
-      }
-      if(typeof(entry.request_thread_control)!="undefined"){
-        console.log("Se recibio solicitud de entregar el control");
-        passThreadControl(entry.request_thread_control.requested_owner_app_id);
       }
     });
     res.status(200).send('EVENT_RECEIVED'); // Returns a '200 OK' response to all requests
@@ -192,8 +192,9 @@ function callHandover(sender_psid){
   });
 }
 
-function passThreadControl(requestorApp){
+function passThreadControl(sender_psid,requestorApp){
   let handover_req={
+    "recipient":{"id":sender_psid},
     "target_app_id":requestorApp,
     "metadata":"Se solicitó atención de una persona"}
   request({
