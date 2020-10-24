@@ -10,6 +10,11 @@ app.listen(process.env.PORT || 5000, () => console.log('webhook is listening'));
 const dotenv=require('dotenv');
 dotenv.config();
 
+//Terminación del proceso
+process.on('SIGTERM', () => {
+  console.log('Proceso terminado')
+})
+
 // Creates the endpoint for our webhook
 app.post('/webhook', (req, res) => {
   let fbJson=JSON.stringify(req.body);
@@ -35,6 +40,9 @@ app.post('/webhook', (req, res) => {
       if(typeof(entry.standby)!="undefined"){
         console.log("Se recibio evento STANDBY");
       }
+      // if(typeof(entry.standby)!="undefined"){
+      //   console.log("Se recibio evento STANDBY");
+      // }
     });
     res.status(200).send('EVENT_RECEIVED'); // Returns a '200 OK' response to all requests
   }
