@@ -10,6 +10,12 @@ app.listen(process.env.PORT || 5000, () => console.log('webhook is listening'));
 const dotenv=require('dotenv');
 dotenv.config();
 
+//Terminación del proceso
+// process.on('SIGTERM', () => {
+//   console.log('Proceso terminado')
+//   process.exit();
+// })
+
 // Creates the endpoint for our webhook
 app.post('/webhook', (req, res) => {
   let fbJson=JSON.stringify(req.body);
@@ -28,8 +34,12 @@ app.post('/webhook', (req, res) => {
         // Check if the event is a message or postback and pass the event to the appropriate handler function
         if (webhook_event.message) {
           handleMessage(sender_psid, webhook_event.message);
-        } else if (webhook_event.postback) {
+        }
+        if (webhook_event.postback) {
           handlePostback(sender_psid, webhook_event.postback);
+        }
+        if (webhook_event.request_thread_control) {
+          passThreadControl(sender_psid, webhook_event.request_thread_control.requested_owner_app_id);
         }
       }
       if(typeof(entry.standby)!="undefined"){
@@ -68,27 +78,13 @@ function handleMessage(sender_psid, received_message) {
     // Check if the message contains text
     if (received_message.text) {
       // Create the payload for a basic text message
-      response = {
-        "attachment": {
-          "type": "template",
-          "payload": {
-            "template_type": "generic",
-            "elements": [{
-              "title": "Bienvenido a la página\nSoy el Foto-bot",
-              "subtitle": "¿En qué te puedo ayudar?",
-              "image_url": "https://www.pngkit.com/png/detail/955-9556311_camara-de-fotos-caricatura.png",
-              "buttons": [
-                {
-                  "type": "postback",
-                  "title": "Información",
-                  "payload": "info",
-                },
-                {
-                  "type": "postback",
-                  "title": "Contactar a un humano",
-                  "payload": "handover",
-                }
-              ],
+      response = {"attachment": {
+          "type": "template","payload": {
+            "template_type": "generic","elements": [{
+              "title": "Bienvenido a la página\nSoy el Foto-bot","subtitle": "¿En qué te puedo ayudar?",
+              "image_url": "http://volley.mx/peteFoto/foto_bot_01.png",
+              "buttons": [{"type": "postback","title": "Información","payload": "info",},
+                {"type": "postback","title": "Contactar a un humano","payload": "handover",}],
             }]
           }
         }
@@ -98,25 +94,12 @@ function handleMessage(sender_psid, received_message) {
     // Gets the URL of the message attachment
       let attachment_url = received_message.attachments[0].payload.url;
       response = {
-        "attachment": {
-          "type": "template",
-          "payload": {
-            "template_type": "generic",
-            "elements": [{
-              "title": "¿Esta es la imagen enviada?",
-              "subtitle": "Usa uno de los botones para responder",
-              "image_url": attachment_url,
-              "buttons": [
-                {
-                  "type": "postback",
-                  "title": "¡SI!",
-                  "payload": "yes",
-                },
-                {
-                  "type": "postback",
-                  "title": "¡NO!",
-                  "payload": "no",
-                }
+        "attachment": {"type": "template","payload": {
+            "template_type": "generic","elements": [{
+              "title": "¿Esta es la imagen enviada?","subtitle": "Usa uno de los botones para responder",
+              "image_url": attachment_url,"buttons": [
+                {"type": "postback","title": "¡SI!","payload": "yes",},
+                {"type": "postback","title": "¡NO!","payload": "no",}
               ],
             }]
           }
@@ -132,9 +115,27 @@ function handlePostback(sender_psid, received_postback) {
   let payload = received_postback.payload; //Get the payload for the postback
   // Set the response based on the postback payload
   if (payload === 'info') {
-    response = { "text": "Una información Lorem Ipsum" }
-  } else if (payload === 'handover') {
-    response = { "text": "Lo estamos transfiriendo" }
+    //let attachment_url="https://icdn5.digitaltrends.com/image/digitaltrends_es/photo-printing-header-640x0-768x768.jpg";
+    response = {"attachment": {"type": "template","payload": {
+      "template_type": "generic","elements": [{
+          "title": "Evento Social","subtitle": "Costo por evento $1,500",
+          "image_url": "http://volley.mx/peteFoto/ev_social.png","buttons": [{"type": "postback","title": "Quiero un Evento Social","payload": "compra",}],},
+          {"title": "Evento Deportivo","subtitle": "Costo por hora $250",
+          "image_url": "http://volley.mx/peteFoto/ev_deportivo.png","buttons": [{"type": "postback","title": "Quiero un Evento Deportivo","payload": "compra",}],},
+          {"title": "Sesión de retrato","subtitle": "Costo por hora $350",
+          "image_url": "http://volley.mx/peteFoto/retrato.png","buttons": [{"type": "postback","title": "Quiero una Sesión de Retrato","payload": "compra",}],},
+          {"title": "Otro tipo de sesión","subtitle": "Contactame",
+          "image_url": "http://volley.mx/peteFoto/foto_otros.png","buttons": [{"type": "postback","title": "Quiero más información","payload": "handover",}],}
+        ]
+      }
+    }}
+  }
+  if (payload === 'handover') {
+    response = {"text": "Te transfiero con Pete ;)"}
+    callHandover(sender_psid);
+  }
+  if (payload === 'compra') {
+    response = {"text": "Afina los detalles con Pete ;)"}
     callHandover(sender_psid);
   }
   callSendAPI(sender_psid, response); // Send the message to acknowledge the postback
@@ -143,10 +144,7 @@ function handlePostback(sender_psid, received_postback) {
 // Sends response messages via the Send API
 function callSendAPI(sender_psid, response) {
   // Construct the message body
-  let request_body = {
-    "recipient": {
-      "id": sender_psid},
-      "message": response}
+  let request_body = {"recipient": {"id": sender_psid},"message": response}
 // Send the HTTP request to the Messenger Platform
   request({
     "uri": "https://graph.facebook.com/v8.0/107336410850663/messages",
@@ -165,10 +163,7 @@ function callSendAPI(sender_psid, response) {
 }
 
 function callHandover(sender_psid){
-  let handover_req={
-    "recipient":{"id":sender_psid},
-    "target_app_id":263902037430900,
-    "metadata":"Se solicitó atención de una persona"}
+  let handover_req={"recipient":{"id":sender_psid},"target_app_id":263902037430900,"metadata":"Se solicitó atención de una persona"}
   request({
     "uri": "https://graph.facebook.com/v8.0/107336410850663/pass_thread_control",
     "qs": { "access_token": process.env.PAGE_ACCESS_TOKEN },
@@ -176,9 +171,25 @@ function callHandover(sender_psid){
     "json": handover_req
   }, (err, res, body) => {
     if (!err) {
-      console.log('handover ejecutado')
+      console.log('Handover a inbox ejecutado')
     } else {
       console.error("Error al enviar ejecutar handover:" + err);
+    }
+  });
+}
+
+function passThreadControl(sender_psid,requestorApp){
+  let handover_req={"recipient":{"id":sender_psid},"target_app_id":requestorApp,"metadata":"Se solicitó atención de una persona"}
+  request({
+    "uri": "https://graph.facebook.com/v8.0/107336410850663/pass_thread_control",
+    "qs": { "access_token": process.env.PAGE_ACCESS_TOKEN },
+    "method": "POST",
+    "json": handover_req
+  }, (err, res, body) => {
+    if (!err) {
+      console.log('Solicitud de handover honrada')
+    } else {
+      console.error("Error al honrar handover:" + err);
     }
   });
 }
